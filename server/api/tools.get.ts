@@ -2,8 +2,8 @@ import { serverSupabaseClient } from '#supabase/server';
 export default defineEventHandler(async (event) => {
 
   const client = await serverSupabaseClient(event);
-  
   const { user } = (await client.auth.getUser()).data;
+  
   if (!user) {
     throw createError({
       statusCode: 401,
