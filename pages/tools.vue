@@ -172,7 +172,7 @@
       <div class="field">
         <label for="date">Service Date</label>
         <Calendar id="date" v-model="tool.service_date" dateFormat="dd/mm/yy" :class="{ 'p-invalid': (submitted||editing) && !tool.service_date }" />
-        <small class="p-error" v-if="(submitted||editing) && !tool.service_date">Service is required.</small>
+        <small class="p-error" v-if="(submitted||editing) && !tool.service_date">Service date is required.</small>
       </div>
       <template #footer>
         <Button label="Cancel" icon="pi pi-times" text @click="hideDialog"/>
