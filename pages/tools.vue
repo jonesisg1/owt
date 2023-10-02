@@ -110,19 +110,21 @@
 </script>
 
 <template>
-  <div class="card min-w-min" :class="{'cursor-wait': cursorWait}">
-    <Toolbar class="mb-4">
-      <template #start>
-        <Button label="New" icon="pi pi-plus" severity="success" class="mr-2" size="small" @click="newTool" :disabled="cursorWait" />
-        <Button label="Edit" icon="pi pi-pencil" class="mr-2" size="small" @click="editTool" :disabled="!selectedTool" />
-        <Button label="Delete" icon="pi pi-trash" severity="danger" size="small" @click="deleteToolDialog = true" :disabled="!selectedTool" />
-      </template>
-      <template #end>
-        <Button label="Quit" icon="pi pi-fw pi-power-off" size="small" @click="logout"  />
-      </template>
-    </Toolbar>
-
-    <DataTable v-model:selection="selectedTool" :value="tools" data-key="asset_id" tableStyle="min-width: 50rem">
+  <div class="card" :class="{'cursor-wait': cursorWait}">
+    <div class="fixed top-0 w-full min-w-max z-5">
+      <Toolbar>
+        <template #start>
+          <Button label="New" icon="pi pi-plus" severity="success" class="mr-2" size="small" @click="newTool" :disabled="cursorWait" />
+          <Button label="Edit" icon="pi pi-pencil" class="mr-2" size="small" @click="editTool" :disabled="!selectedTool" />
+          <Button label="Delete" icon="pi pi-trash" severity="danger" size="small" @click="deleteToolDialog = true" :disabled="!selectedTool" />
+        </template>
+        <template #end>
+          <Button label="Quit" icon="pi pi-fw pi-power-off" size="small" @click="logout"  />
+        </template>
+      </Toolbar>
+    </div>
+   
+    <DataTable v-model:selection="selectedTool" :value="tools" data-key="asset_id" tableStyle="min-width: 50rem" class="mt-8">
       <Column selectionMode="single" style="width: 3rem" :exportable="false"></Column>
       <Column v-for="col of columns" :key="col.field" :field="col.field" :header="col.header"></Column>
       <column header="Type">
@@ -193,3 +195,10 @@
 
   </div>
 </template>
+
+<style>
+.p-toolbar {
+  padding: 1rem;
+  margin-right: 15px;
+}
+</style>
