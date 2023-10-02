@@ -13,7 +13,8 @@
     "@nuxt/devtools": "latest",
     "@nuxtjs/supabase": "^1.1.0",
     "dayjs-nuxt": "^1.2.2",
-    "nuxt": "^3.7.3"
+    "nuxt": "^3.7.3",
+    "supabase": "^1.99.5"
   },
   "dependencies": {
     "primeflex": "^3.3.1",

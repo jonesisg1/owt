@@ -9,7 +9,36 @@ export type Json =
 export interface Database {
   public: {
     Tables: {
-      [_ in never]: never
+      tool: {
+        Row: {
+          asset_id: string
+          diameter: number | null
+          length: number | null
+          location: string | null
+          service_date: string | null
+          type: number
+          weight: number | null
+        }
+        Insert: {
+          asset_id: string
+          diameter?: number | null
+          length?: number | null
+          location?: string | null
+          service_date?: string | null
+          type: number
+          weight?: number | null
+        }
+        Update: {
+          asset_id?: string
+          diameter?: number | null
+          length?: number | null
+          location?: string | null
+          service_date?: string | null
+          type?: number
+          weight?: number | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
