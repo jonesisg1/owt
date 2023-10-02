@@ -139,7 +139,7 @@
       </Column>
     </DataTable>
 
-    <Dialog v-model:visible="toolDialog" :style="{width: '450px'}" header="Tool Details" :modal="true" class="p-fluid">
+    <Dialog v-model:visible="toolDialog" :style="{width: '450px'}" header="Tool Details" :modal="true" class="p-fluid" :breakpoints="{ '600px': '100vw' }">
       <div class="field">
         <label for="weight">Weight</label>
         <InputNumber id="weight" v-model.trim="tool.weight" :maxFractionDigits="10" suffix=" kg" required="true" autofocus :class="{'p-invalid': (submitted||editing) && !tool.weight}" />
@@ -198,7 +198,8 @@
 
 <style>
 .p-toolbar {
-  padding: 1rem;
+  padding: 0.5rem;
   margin-right: 15px;
+  margin-top: 10px;
 }
 </style>
