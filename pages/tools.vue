@@ -8,6 +8,8 @@
   const editing = ref(false);
   const cursorWait = ref(false);
 
+  const user = useSupabaseUser();
+
   const { data: tools, refresh } = await useFetch('/api/tools', { headers: useRequestHeaders(['cookie']) });
 
   const columns = [
@@ -18,6 +20,23 @@
     { field:'location', header:'Location' }
     // Handle type and service_date in template.
   ];
+
+  const menu = ref();
+  const menuItems = ref([{
+    label: user.value.email,
+    items: [
+    {
+        label: 'Quit',
+        icon: 'pi pi-fw pi-power-off',
+        command: () => {
+            logout();
+        }
+    }
+  ]}])
+
+  const onClick = (event) => {
+    menu.value.toggle(event);
+  }
 
   async function logout () {
     const client = useSupabaseClient();
@@ -31,11 +50,13 @@
     toolDialog.value = true;
   }
 
-  function editTool () {
+  async function editTool () {
     tool.value = JSON.parse(JSON.stringify(selectedTool.value));
     tool.value.service_date = new Date(selectedTool.value.service_date);
     editing.value = true;
     toolDialog.value = true;
+    await nextTick();
+    document.getElementById("weight").children[0].focus();
   }
 
   async function deleteTool () {
@@ -107,6 +128,18 @@
     return patch;
   }
 
+  const winSmall = ref(false);
+  function onResize() {
+    winSmall.value = (window.innerWidth > 400) ? false : true;
+  }
+
+  onMounted(() => {
+    nextTick(() => {
+      onResize()
+      window.addEventListener('resize', onResize)
+    })
+  })
+
 </script>
 
 <template>
@@ -114,12 +147,16 @@
     <div class="fixed top-0 w-full min-w-max z-5">
       <Toolbar>
         <template #start>
-          <Button label="New" icon="pi pi-plus" severity="success" class="mr-2" size="small" @click="newTool" :disabled="cursorWait" />
-          <Button label="Edit" icon="pi pi-pencil" class="mr-2" size="small" @click="editTool" :disabled="!selectedTool" />
-          <Button label="Delete" icon="pi pi-trash" severity="danger" size="small" @click="deleteToolDialog = true" :disabled="!selectedTool" />
+          <Button icon="pi pi-plus" :label="(winSmall) ? null : 'New'" severity="success" class="mr-2" size="small" @click="newTool" :disabled="cursorWait" />
+          <Button icon="pi pi-pencil" :label="(winSmall) ? null : 'Edit'" class="mr-2" size="small" @click="editTool" :disabled="!selectedTool" />
+          <Button icon="pi pi-trash" :label="(winSmall) ? null : 'Delete'" severity="danger" size="small" @click="deleteToolDialog = true" :disabled="!selectedTool" />
         </template>
         <template #end>
-          <Button label="Quit" icon="pi pi-fw pi-power-off" size="small" @click="logout"  />
+          <Button icon="pi pi-user"  size="small" @click="onClick" />
+          <Menu ref="menu" :model="menuItems" :popup="true" 
+          :pt="{
+            root: {class: 'min-w-max'}
+          }"/>
         </template>
       </Toolbar>
     </div>
@@ -140,9 +177,9 @@
     </DataTable>
 
     <Dialog v-model:visible="toolDialog" :style="{width: '450px'}" header="Tool Details" :modal="true" class="p-fluid" :breakpoints="{ '600px': '100vw' }">
-      <div class="field">
+      <div class="field"> <!-- issue with v-focustrap -->
         <label for="weight">Weight</label>
-        <InputNumber id="weight" v-model.trim="tool.weight" :maxFractionDigits="10" suffix=" kg" required="true" autofocus :class="{'p-invalid': (submitted||editing) && !tool.weight}" />
+        <InputNumber id="weight" v-model.trim="tool.weight" :maxFractionDigits="10" suffix=" kg" required="true" autofocus="true" :class="{'p-invalid': (submitted||editing) && !tool.weight}" />
         <small class="p-error" v-if="(submitted||editing) && !tool.weight">Weight is required.</small>
       </div>
       <div class="field">

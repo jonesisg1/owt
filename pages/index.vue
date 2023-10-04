@@ -27,7 +27,7 @@
 
         <div class="flex flex-column gap-2">
           <label for="email">Email</label>
-          <InputText id="email" v-model:model-value="email" :class="{'p-invalid': invalid}" autocomplete="on">
+          <InputText id="email" v-model:model-value="email" :class="{'p-invalid': invalid}" autocomplete="on" autofocus="true">
           </InputText>
         </div>
 

@@ -14,6 +14,7 @@ import Toolbar from "primevue/toolbar";
 import Dialog from "primevue/dialog";
 import RadioButton from "primevue/radiobutton";
 import Calendar from "primevue/calendar";
+import Menu from "primevue/menu";
 
 export default defineNuxtPlugin((nuxtApp) => {
     nuxtApp.vueApp.use(PrimeVue, { ripple: true });
@@ -30,5 +31,6 @@ export default defineNuxtPlugin((nuxtApp) => {
     nuxtApp.vueApp.component("Dialog", Dialog);
     nuxtApp.vueApp.component("RadioButton", RadioButton);
     nuxtApp.vueApp.component("Calendar", Calendar);
+    nuxtApp.vueApp.component("Menu", Menu);
     //other components that you need
 });
