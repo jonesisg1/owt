@@ -44,9 +44,10 @@
     navigateTo('/');
   }
 
-  function newTool () {
+  async function newTool () {
     tool.value = {};
     submitted.value = false;
+    editing.value = false;
     toolDialog.value = true;
   }
 
