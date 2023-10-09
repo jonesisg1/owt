@@ -2,8 +2,7 @@
 export default defineNuxtConfig({
   devtools: { enabled: true }, 
   modules: [
-    '@nuxtjs/supabase',
-    'dayjs-nuxt'
+    '@nuxtjs/supabase'
   ],
   runtimeConfig: {
     public: {
