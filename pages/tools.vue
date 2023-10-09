@@ -55,10 +55,9 @@
   }
 
   async function showDialog () {
-  toolDialog.value = true;
+    toolDialog.value = true;
     await nextTick();
-    var elements = document.getElementsByClassName('input-select');
-    elements[0].focus();
+    document.getElementById((selectedTool.value.type === 'Open hole') ? 'ipType1' : 'ipType2').focus();
   }
 
   function newTool () {
@@ -206,23 +205,20 @@
         </template>
         <template #end>
           <Button icon="pi pi-user"  size="small" @click="onClick" />
-          <Menu ref="menu" :model="menuItems" :popup="true" 
-          :pt="{
-            root: {class: 'min-w-max'}
-          }"/>
+          <Menu ref="menu" :model="menuItems" :popup="true" :pt="{ root: {class: 'min-w-max'} }" />
         </template>
       </Toolbar>
     </div>
    
     <DataTable v-model:filters="filters" v-model:selection="selectedTool" :value="tools" data-key="asset_id" tableStyle="min-width: 50rem" class="mt-8" filterDisplay="menu" :globalFilterFields="['asset_id', 'weight', 'length', 'diameter', 'location', 'service_date', 'type']">
       <template #header>
-          <div class="flex justify-content-between">
-              <Button type="button" icon="pi pi-filter-slash" :label="(winSmall) ? null : 'Clear'" @click="clearFilter()" size="small" mr-2/>
-              <span class="p-input-icon-left">
-                  <i class="pi pi-search" />
-                  <InputText v-model="filters['global'].value" placeholder="Keyword Search" size="small"/>
-              </span>
-          </div>
+        <div class="flex justify-content-between">
+          <Button type="button" icon="pi pi-filter-slash" :label="(winSmall) ? null : 'Clear'" @click="clearFilter()" size="small" class="mr-2"/>
+          <span class="p-input-icon-left">
+            <i class="pi pi-search" />
+            <InputText v-model="filters['global'].value" placeholder="Keyword Search" size="small"/>
+          </span>
+        </div>
       </template>
       <Column selectionMode="single" style="width: 3rem" :exportable="false"></Column>
       <Column v-for="col of columns" :key="col.field" :field="col.field" :header="col.header"></Column>
@@ -236,21 +232,18 @@
     <Dialog v-model:visible="toolDialog" :style="{width: '450px'}" header="Tool Details" :modal="true" class="p-fluid" :breakpoints="{ '600px': '100vw' }">
       <div class="field flex flex-wrap gap-3 mt-1">
         <div class="flex align-items-center">
-          <RadioButton id="type1" v-model="tool.type" inputId="type1" value="Open hole" :class="{'p-invalid': (submitted||editing) && !tool.type}" 
-          :pt="{ 
-            hiddenInput: {class: 'input-select'}
-          } " />
+          <RadioButton id="type1" v-model="tool.type" inputId="ipType1" value="Open hole" :class="{'p-invalid': (submitted||editing) && !tool.type}" />
           <label for="type1" class="ml-2">Open hole</label>
         </div>
         <div class="flex align-items-center">
-          <RadioButton id="type2" v-model="tool.type" inputId="type2" value="Cased hole" :class="{'p-invalid': (submitted||editing) && !tool.type}" />
+          <RadioButton id="type2" v-model="tool.type" inputId="ipType2" value="Cased hole" :class="{'p-invalid': (submitted||editing) && !tool.type}" />
           <label for="type2" class="ml-2">Cased hole</label>
         </div>
         <small class="p-error" v-if="(submitted||editing) && !tool.type">Type is required.</small>
       </div>
       <div class="field">
         <label for="weight">Weight</label>
-        <InputNumber id="weight" v-model.trim="tool.weight" :maxFractionDigits="10" suffix=" kg" required="true" autofocus="true" :class="{'p-invalid': (submitted||editing) && !tool.weight}" />
+        <InputNumber id="weight" v-model.trim="tool.weight" :maxFractionDigits="10" suffix=" kg" required="true" :class="{'p-invalid': (submitted||editing) && !tool.weight}" />
         <small class="p-error" v-if="(submitted||editing) && !tool.weight">Weight is required.</small>
       </div>
       <div class="field">
