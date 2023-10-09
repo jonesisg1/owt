@@ -1,5 +1,4 @@
 <script setup>
-  const dayjs = useDayjs();
   const selectedTool = ref();
   const toolDialog = ref(false);
   const deleteToolDialog = ref(false);
@@ -10,14 +9,25 @@
 
   const user = useSupabaseUser();
 
-  const { data: tools, refresh } = await useFetch('/api/tools', { headers: useRequestHeaders(['cookie']) });
+  const { data: tools, refresh } = await useFetch('/api/tools', {
+    headers: useRequestHeaders(['cookie']),
+    transform: (tools) => {
+      return tools.map((tool) => {
+        tool.type = (tool.type === 1) ? 'Open hole' : 'Cased hole'
+        tool.service_date = new Date(tool.service_date);
+        return tool;
+       })
+  }
+  });
 
   const columns = [
     { field:'asset_id', header:'Asset ID' },
+    { field:'type', header:'Type' },
     { field:'weight', header:'Weight' },
     { field:'length', header:'Length' },
     { field:'diameter', header:'Diameter' },
-    { field:'location', header:'Location' }
+    { field:'location', header:'Location' },
+    // { field:'service_date', header: 'Service Date'}
     // Handle type and service_date in template.
   ];
 
@@ -44,20 +54,25 @@
     navigateTo('/');
   }
 
-  async function newTool () {
+  async function showDialog () {
+  toolDialog.value = true;
+    await nextTick();
+    var elements = document.getElementsByClassName('input-select');
+    elements[0].focus();
+  }
+
+  function newTool () {
     tool.value = {};
     submitted.value = false;
     editing.value = false;
-    toolDialog.value = true;
+    showDialog();
   }
 
-  async function editTool () {
+  function editTool () {
     tool.value = JSON.parse(JSON.stringify(selectedTool.value));
     tool.value.service_date = new Date(selectedTool.value.service_date);
     editing.value = true;
-    toolDialog.value = true;
-    await nextTick();
-    document.getElementById("weight").children[0].focus();
+    showDialog();
   }
 
   async function deleteTool () {
@@ -93,7 +108,17 @@
       await $fetch( '/api/tools', {
         method: 'POST',
         body: {
-          rowData: tool.value
+          rowData: createPatch(
+            {
+              weight: null,
+              length: null,
+              diameter: null,
+              location: null,
+              type: null,
+              service_date: new Date() 
+            },
+            tool.value
+          )
         }
       });
     } else {
@@ -106,29 +131,38 @@
       });
       selectedTool.value = null;
     }
-    refresh();
+    await refresh();
     cursorWait.value = false;
   }
 
   function createPatch (source, target) {
     // source object prperties from supabase are always strings
+    console.log(source)
+    console.log(target)
     let patch = {};
     let s, t;
     for(const prop in source) {
       if(target[prop] instanceof Date) {
-        s = new Date(source[prop]).toISOString();
+        // s = new Date(source[prop]).toISOString();
+        s = source[prop].toISOString();
         t = target[prop].toISOString();
       } else {
         s = source[prop];
         t = target[prop];
       }
       if(s !== t) {
-        patch[prop] = target[prop];
+        if(prop === 'type') {
+          patch[prop] = (t === 'Open hole') ? 1 : 2;
+        } else {
+          patch[prop] = target[prop];
+        }
       }
     }
+    console.log(patch)
     return patch;
   }
 
+  // ToolBar icons only for small screens
   const winSmall = ref(false);
   function onResize() {
     winSmall.value = (window.innerWidth > 400) ? false : true;
@@ -140,6 +174,24 @@
       window.addEventListener('resize', onResize)
     })
   })
+
+  // DataTable filter logic
+  import { FilterMatchMode, FilterOperator } from 'primevue/api';
+  const filters = ref();
+  const initFilters = () => {
+    filters.value = {
+        global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        asset_id: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+        weight: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
+        length: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
+        diameter: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
+        location: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+        type: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+        service_date: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }] }
+    };
+  };
+  
+  initFilters();
 
 </script>
 
@@ -162,23 +214,41 @@
       </Toolbar>
     </div>
    
-    <DataTable v-model:selection="selectedTool" :value="tools" data-key="asset_id" tableStyle="min-width: 50rem" class="mt-8">
+    <DataTable v-model:filters="filters" v-model:selection="selectedTool" :value="tools" data-key="asset_id" tableStyle="min-width: 50rem" class="mt-8" filterDisplay="menu" :globalFilterFields="['asset_id', 'weight', 'length', 'diameter', 'location', 'service_date', 'type']">
+      <template #header>
+          <div class="flex justify-content-between">
+              <Button type="button" icon="pi pi-filter-slash" :label="(winSmall) ? null : 'Clear'" @click="clearFilter()" size="small"/>
+              <span class="p-input-icon-left">
+                  <i class="pi pi-search" />
+                  <InputText v-model="filters['global'].value" placeholder="Keyword Search" size="small"/>
+              </span>
+          </div>
+      </template>
       <Column selectionMode="single" style="width: 3rem" :exportable="false"></Column>
       <Column v-for="col of columns" :key="col.field" :field="col.field" :header="col.header"></Column>
-      <column header="Type">
-        <template #body="slotProps">
-          {{ (slotProps.data.type === 1) ? 'Open hole' : 'Cased hole' }}
-        </template>
-      </column>
       <Column header="Service Date">
         <template #body="slotProps">
-          {{ dayjs(slotProps.data.service_date).format('DD/MM/YYYY') }}
+          {{ slotProps.data.service_date.toLocaleDateString('en-GB') }}
         </template>
       </Column>
     </DataTable>
 
     <Dialog v-model:visible="toolDialog" :style="{width: '450px'}" header="Tool Details" :modal="true" class="p-fluid" :breakpoints="{ '600px': '100vw' }">
-      <div class="field"> <!-- issue with v-focustrap -->
+      <div class="field flex flex-wrap gap-3 mt-1">
+        <div class="flex align-items-center">
+          <RadioButton id="type1" v-model="tool.type" inputId="type1" value="Open hole" :class="{'p-invalid': (submitted||editing) && !tool.type}" 
+          :pt="{ 
+            hiddenInput: {class: 'input-select'}
+          } " />
+          <label for="type1" class="ml-2">Open hole</label>
+        </div>
+        <div class="flex align-items-center">
+          <RadioButton id="type2" v-model="tool.type" inputId="type2" value="Cased hole" :class="{'p-invalid': (submitted||editing) && !tool.type}" />
+          <label for="type2" class="ml-2">Cased hole</label>
+        </div>
+        <small class="p-error" v-if="(submitted||editing) && !tool.type">Type is required.</small>
+      </div>
+      <div class="field">
         <label for="weight">Weight</label>
         <InputNumber id="weight" v-model.trim="tool.weight" :maxFractionDigits="10" suffix=" kg" required="true" autofocus="true" :class="{'p-invalid': (submitted||editing) && !tool.weight}" />
         <small class="p-error" v-if="(submitted||editing) && !tool.weight">Weight is required.</small>
@@ -197,17 +267,6 @@
         <label for="location">Location</label>
         <InputText id="location" v-model.trim="tool.location" required="true" :class="{'p-invalid': (submitted||editing) && !tool.location}" />
         <small class="p-error" v-if="(submitted||editing) && !tool.location">Location is required.</small>
-      </div>
-      <div class="field flex flex-wrap gap-3">
-        <div class="flex align-items-center">
-          <RadioButton v-model="tool.type" inputId="type1" :value="Number(1)" :class="{'p-invalid': (submitted||editing) && !tool.type}" />
-          <label for="type1" class="ml-2">Open hole</label>
-        </div>
-        <div class="flex align-items-center">
-          <RadioButton v-model="tool.type" inputId="type2" :value="Number(2)" :class="{'p-invalid': (submitted||editing) && !tool.type}" />
-          <label for="type2" class="ml-2">Cased hole</label>
-        </div>
-        <small class="p-error" v-if="(submitted||editing) && !tool.type">Type is required.</small>
       </div>
       <div class="field">
         <label for="date">Service Date</label>
