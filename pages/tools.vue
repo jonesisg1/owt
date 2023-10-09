@@ -217,7 +217,7 @@
     <DataTable v-model:filters="filters" v-model:selection="selectedTool" :value="tools" data-key="asset_id" tableStyle="min-width: 50rem" class="mt-8" filterDisplay="menu" :globalFilterFields="['asset_id', 'weight', 'length', 'diameter', 'location', 'service_date', 'type']">
       <template #header>
           <div class="flex justify-content-between">
-              <Button type="button" icon="pi pi-filter-slash" :label="(winSmall) ? null : 'Clear'" @click="clearFilter()" size="small"/>
+              <Button type="button" icon="pi pi-filter-slash" :label="(winSmall) ? null : 'Clear'" @click="clearFilter()" size="small" mr-2/>
               <span class="p-input-icon-left">
                   <i class="pi pi-search" />
                   <InputText v-model="filters['global'].value" placeholder="Keyword Search" size="small"/>

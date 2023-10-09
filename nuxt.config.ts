@@ -25,11 +25,5 @@ export default defineNuxtConfig({
       login: '/',
       callback: '/confirm'
     },
-  },
-  dayjs: {
-    locales: ['en'],
-    plugins: ['relativeTime', 'utc', 'timezone'],
-    defaultLocale: 'en',
-    defaultTimezone: 'Europe/London',
   }
 })
