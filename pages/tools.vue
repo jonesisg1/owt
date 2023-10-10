@@ -163,8 +163,10 @@
 
   // ToolBar icons only for small screens
   const winSmall = ref(false);
+  const toggleSearch = ref(false);
   function onResize() {
     winSmall.value = (window.innerWidth > 400) ? false : true;
+    toggleSearch.value = (window.innerWidth > 700) ? false : true;
   }
 
   onMounted(() => {
@@ -195,7 +197,7 @@
   function clearFilter () {
     initFilters();
   };
-
+  
 </script>
 
 <template>
@@ -207,6 +209,15 @@
           <Button icon="pi pi-pencil" :label="(winSmall) ? null : 'Edit'" class="mr-2" size="small" @click="editTool" :disabled="!selectedTool" />
           <Button icon="pi pi-trash" :label="(winSmall) ? null : 'Delete'" severity="danger" size="small" @click="deleteToolDialog = true" :disabled="!selectedTool" />
         </template>
+        <template v-if="!toggleSearch" #center>
+          <div class="p-inputgroup flex justify-content-center">
+          <span class="p-input-icon-left">
+            <i class="pi pi-search" />
+            <InputText v-model="filters['global'].value" placeholder="Keyword Search" size="small" :pt="{root: {class: 'inputgroup-icon-left-button-right'}}"/>
+          </span>
+          <Button type="button" icon="pi pi-filter-slash" @click="clearFilter()" size="small" />
+        </div>
+        </template>
         <template #end>
           <Button icon="pi pi-user"  size="small" @click="onClick" />
           <Menu ref="menu" :model="menuItems" :popup="true" :pt="{ root: {class: 'min-w-max'} }" />
@@ -215,7 +226,7 @@
     </div>
    
     <DataTable v-model:filters="filters" v-model:selection="selectedTool" :value="tools" data-key="asset_id" tableStyle="min-width: 50rem" class="mt-8" filterDisplay="menu" :globalFilterFields="['asset_id', 'weight', 'length', 'diameter', 'location', 'service_date', 'type']">
-      <template #header>
+      <template v-if="toggleSearch" #header>
         <div class="p-inputgroup flex justify-content-center">
           <span class="p-input-icon-left">
             <i class="pi pi-search" />
