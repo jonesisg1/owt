@@ -192,6 +192,10 @@
   
   initFilters();
 
+  function clearFilter () {
+    initFilters();
+  };
+
 </script>
 
 <template>
@@ -212,12 +216,12 @@
    
     <DataTable v-model:filters="filters" v-model:selection="selectedTool" :value="tools" data-key="asset_id" tableStyle="min-width: 50rem" class="mt-8" filterDisplay="menu" :globalFilterFields="['asset_id', 'weight', 'length', 'diameter', 'location', 'service_date', 'type']">
       <template #header>
-        <div class="flex justify-content-between">
-          <Button type="button" icon="pi pi-filter-slash" :label="(winSmall) ? null : 'Clear'" @click="clearFilter()" size="small" class="mr-2"/>
+        <div class="p-inputgroup flex justify-content-center">
           <span class="p-input-icon-left">
             <i class="pi pi-search" />
-            <InputText v-model="filters['global'].value" placeholder="Keyword Search" size="small"/>
+            <InputText v-model="filters['global'].value" placeholder="Keyword Search" size="small" :pt="{root: {class: 'inputgroup-icon-left-button-right'}}"/>
           </span>
+          <Button type="button" icon="pi pi-filter-slash" @click="clearFilter()" size="small" class="mr-2"/>
         </div>
       </template>
       <Column selectionMode="single" style="width: 3rem" :exportable="false"></Column>
@@ -287,9 +291,17 @@
 </template>
 
 <style>
-.p-toolbar {
-  padding: 0.5rem;
-  margin-right: 15px;
-  margin-top: 10px;
-}
+  .p-toolbar {
+    padding: 0.5rem;
+    margin-right: 15px;
+    margin-top: 10px;
+  }
+  .p-inputgroup {
+    min-width: 12rem;
+  }
+  .inputgroup-icon-left-button-right {
+    width: auto;
+    border-end-end-radius: 0%;
+    border-start-end-radius: 0%;
+  }
 </style>
