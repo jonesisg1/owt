@@ -12,6 +12,7 @@
   const { data: tools, refresh } = await useFetch('/api/tools', {
     headers: useRequestHeaders(['cookie']),
     transform: (tools) => {
+      // Transform the enum and date text into text and Date data type so that they can be searched in the data table.
       return tools.map((tool) => {
         tool.type = (tool.type === 1) ? 'Open hole' : 'Cased hole'
         tool.service_date = new Date(tool.service_date);
@@ -34,17 +35,14 @@
   const menu = ref();
   const menuItems = ref([{
     label: user.value.email,
-    items: [
-    {
-        label: 'Quit',
-        icon: 'pi pi-fw pi-power-off',
-        command: () => {
-            logout();
-        }
-    }
-  ]}])
+    items: [{
+      label: 'Quit',
+      icon: 'pi pi-fw pi-power-off',
+      command: () => {logout(); }
+    }]
+  }])
 
-  const onClick = (event) => {
+  function menuClick (event) {
     menu.value.toggle(event);
   }
 
@@ -135,14 +133,13 @@
   }
 
   function createPatch (source, target) {
-    // source object prperties from supabase are always strings
+    // source object properties from supabase are always strings
     console.log(source)
     console.log(target)
     let patch = {};
     let s, t;
     for(const prop in source) {
       if(target[prop] instanceof Date) {
-        // s = new Date(source[prop]).toISOString();
         s = source[prop].toISOString();
         t = target[prop].toISOString();
       } else {
@@ -157,7 +154,7 @@
         }
       }
     }
-    console.log(patch)
+    // console.log(patch)
     return patch;
   }
 
@@ -210,16 +207,10 @@
           <Button icon="pi pi-trash" :label="(winSmall) ? null : 'Delete'" severity="danger" size="small" @click="deleteToolDialog = true" :disabled="!selectedTool" />
         </template>
         <template v-if="!toggleSearch" #center>
-          <div class="p-inputgroup flex justify-content-center">
-          <span class="p-input-icon-left">
-            <i class="pi pi-search" />
-            <InputText v-model="filters['global'].value" placeholder="Keyword Search" size="small" :pt="{root: {class: 'inputgroup-icon-left-button-right'}}"/>
-          </span>
-          <Button type="button" icon="pi pi-filter-slash" @click="clearFilter()" size="small" />
-        </div>
+          <SearchInput v-model="filters['global'].value" @clear-filter="clearFilter()" />
         </template>
         <template #end>
-          <Button icon="pi pi-user"  size="small" @click="onClick" />
+          <Button icon="pi pi-user"  size="small" @click="menuClick" />
           <Menu ref="menu" :model="menuItems" :popup="true" :pt="{ root: {class: 'min-w-max'} }" />
         </template>
       </Toolbar>
@@ -227,13 +218,7 @@
    
     <DataTable v-model:filters="filters" v-model:selection="selectedTool" :value="tools" data-key="asset_id" tableStyle="min-width: 50rem" class="mt-8" filterDisplay="menu" :globalFilterFields="['asset_id', 'weight', 'length', 'diameter', 'location', 'service_date', 'type']">
       <template v-if="toggleSearch" #header>
-        <div class="p-inputgroup flex justify-content-center">
-          <span class="p-input-icon-left">
-            <i class="pi pi-search" />
-            <InputText v-model="filters['global'].value" placeholder="Keyword Search" size="small" :pt="{root: {class: 'inputgroup-icon-left-button-right'}}"/>
-          </span>
-          <Button type="button" icon="pi pi-filter-slash" @click="clearFilter()" size="small" class="mr-2"/>
-        </div>
+        <SearchInput v-model="filters['global'].value" @clear-filter="clearFilter()" />
       </template>
       <Column selectionMode="single" style="width: 3rem" :exportable="false"></Column>
       <Column v-for="col of columns" :key="col.field" :field="col.field" :header="col.header"></Column>
@@ -306,13 +291,5 @@
     padding: 0.5rem;
     margin-right: 15px;
     margin-top: 10px;
-  }
-  .p-inputgroup {
-    min-width: 12rem;
-  }
-  .inputgroup-icon-left-button-right {
-    width: auto;
-    border-end-end-radius: 0%;
-    border-start-end-radius: 0%;
   }
 </style>
