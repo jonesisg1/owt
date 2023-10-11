@@ -55,7 +55,11 @@
   async function showDialog () {
     toolDialog.value = true;
     await nextTick();
-    document.getElementById((selectedTool.value.type === 'Open hole') ? 'ipType1' : 'ipType2').focus();
+    if(tool.value.asset_id === undefined) {
+      document.getElementById('ipType1').focus();
+    } else {
+      document.getElementById((selectedTool.value.type === 'Open hole') ? 'ipType1' : 'ipType2').focus();
+    }
   }
 
   function newTool () {
@@ -199,7 +203,7 @@
 
 <template>
   <div class="card" :class="{'cursor-wait': cursorWait}">
-    <div class="fixed top-0 w-full min-w-max z-5">
+    <div class="fixed top-0 w-full min-w-max z-5" style="background-color: white;">
       <Toolbar>
         <template #start>
           <Button icon="pi pi-plus" :label="(winSmall) ? null : 'New'" severity="success" class="mr-2" size="small" @click="newTool" :disabled="cursorWait" />
