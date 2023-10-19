@@ -20,7 +20,7 @@
       <i class="pi pi-search" />
       <InputText v-model="value" placeholder="Keyword Search" size="small" :pt="{root: {class: 'inputgroup-icon-left-button-right'}}"/>
     </span>
-    <Button type="button" icon="pi pi-filter-slash" @click="$emit('clearFilter')" size="small" class="mr-2"/>
+    <Button type="button" icon="pi pi-filter-slash" @click="$emit('clearFilter')" size="small"/>
   </div>
 </template>
 
