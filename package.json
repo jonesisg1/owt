@@ -1,4 +1,7 @@
 {
+  "overrides": {
+    "vue": "latest"
+  },
   "name": "nuxt-app",
   "private": true,
   "type": "module",
@@ -16,6 +19,9 @@
     "supabase": "^1.99.5"
   },
   "dependencies": {
+    "@pinia/nuxt": "^0.5.1",
+    "aws-jwt-verify": "^4.0.0",
+    "pinia": "^2.1.7",
     "primeflex": "^3.3.1",
     "primeicons": "^6.0.1",
     "primevue": "^3.35.0"

@@ -2,11 +2,15 @@
 export default defineNuxtConfig({
   devtools: { enabled: true }, 
   modules: [
-    '@nuxtjs/supabase'
+    '@nuxtjs/supabase',
+    '@pinia/nuxt',
   ],
   runtimeConfig: {
+    cognitoAppClientSecret:'',
     public: {
-      baseUrl: process.env.BASE_URL || 'http://localhost:3000'
+      baseUrl: process.env.BASE_URL || 'http://localhost:3000',
+      cognitoUserPoolId:'',
+      cognitoAppClientId: '',
     },
   },
   css: [
@@ -20,9 +24,10 @@ export default defineNuxtConfig({
   supabase: {
     clientOptions: {
       db: { schema: 'owt' }
-    },    
+    },
+    redirect: false, 
     redirectOptions: {
-      login: '/',
+      login: '/sbAuth',
       callback: '/confirm'
     },
   }

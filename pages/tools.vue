@@ -1,4 +1,8 @@
 <script setup>
+  console.log('tools <script setup>');
+  const store = useGlobalStore();
+  console.log(`From store! ${store.user.email}`);
+
   const selectedTool = ref();
   const toolDialog = ref(false);
   const deleteToolDialog = ref(false);
@@ -7,7 +11,7 @@
   const editing = ref(false);
   const cursorWait = ref(false);
 
-  const user = useSupabaseUser();
+  // const user = useSupabaseUser();
 
   const { data: tools, refresh } = await useFetch('/api/tools', {
     headers: useRequestHeaders(['cookie']),
@@ -34,7 +38,7 @@
 
   const menu = ref();
   const menuItems = ref([{
-    label: user.value.email,
+    label: store.user.email,
     items: [{
       label: 'Quit',
       icon: 'pi pi-fw pi-power-off',
@@ -47,8 +51,8 @@
   }
 
   async function logout () {
-    const client = useSupabaseClient();
-    await client.auth.signOut();
+    // const client = useSupabaseClient();
+    // await client.auth.signOut();
     navigateTo('/');
   }
 
@@ -121,15 +125,17 @@
             tool.value
           )
         }
-      });
+      }).catch((err) => alert(err.message));
     } else {
+    
       await $fetch( '/api/tools', {
         method: 'PATCH',
         body: {
           rowKey: selectedTool.value.asset_id,
           rowData: createPatch(selectedTool.value, tool.value)
         }
-      });
+      }).catch((err) => alert(err.message));
+      
       selectedTool.value = null;
     }
     await refresh();
