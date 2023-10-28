@@ -1,18 +1,21 @@
 <script setup lang="ts">
-
+    import { getIdTokenFromHash, decodeIdToken, type tokenProps } from '~/app_modules/cognito'
     const store  = useGlobalStore();
     const route = useRoute()
-    const idToken = route.hash.substring(1).split('&').find((element)=> element.split('=')[0]='id_token')?.split('=')[1];
+    const idToken = getIdTokenFromHash(route.hash);
 
     // const idToken = (Array.isArray(route.query.id_token)) ? route.query.id_token[0] : route.query.id_token;
     if (!process.server) {
         console.log('hello client')
-        const runtimeConfig = useRuntimeConfig();
-        // Verifier that expects valid access tokens:
-        console.log(`pool=${runtimeConfig.public.cognitoUserPoolId} client=${runtimeConfig.public.cognitoAppClientId} token=${idToken}`)
-        console.log('hello client 2')
-        await store.logInAwsUser(idToken||'');
-        if(store.user.email){
+        
+        const user: tokenProps = await decodeIdToken(idToken);
+        if(user.email){
+            store.$patch((store) => {
+                store.email = user.email;
+                store.nickName = user.nickName;
+                store.IdP = 'aws';
+                store.awsIdToken = idToken;
+            })
             navigateTo('tools');
         } else {
             navigateTo('/');

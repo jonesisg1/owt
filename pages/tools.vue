@@ -1,7 +1,7 @@
 <script setup>
   console.log('tools <script setup>');
   const store = useGlobalStore();
-  console.log(`From store! ${store.user.email}`);
+  console.log(`From store! ${store.email}`);
 
   const selectedTool = ref();
   const toolDialog = ref(false);
@@ -38,9 +38,9 @@
 
   const menu = ref();
   const menuItems = ref([{
-    label: store.user.email,
+    label: store.email,
     items: [{
-      label: 'Quit',
+      label: `Logout (${store.IdP})` ,
       icon: 'pi pi-fw pi-power-off',
       command: () => {logout(); }
     }]
@@ -51,8 +51,8 @@
   }
 
   async function logout () {
-    // const client = useSupabaseClient();
-    // await client.auth.signOut();
+    const client = useSupabaseClient();
+    await client.auth.signOut();
     navigateTo('/');
   }
 
@@ -109,9 +109,12 @@
     }
     cursorWait.value = true;
     hideDialog();
+    const authHeader = (store.IdP === 'aws') ? { Authorization: `Bearer ${store.awsIdToken}` } : '';
+    console.log(authHeader)
     if(tool.value.asset_id === undefined){
       await $fetch( '/api/tools', {
         method: 'POST',
+        headers: authHeader,
         body: {
           rowData: createPatch(
             {
@@ -130,6 +133,7 @@
     
       await $fetch( '/api/tools', {
         method: 'PATCH',
+        headers: authHeader,
         body: {
           rowKey: selectedTool.value.asset_id,
           rowData: createPatch(selectedTool.value, tool.value)

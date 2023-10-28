@@ -1,6 +1,8 @@
 <script setup lang="ts">
 
-  const { auth } = useSupabaseClient()
+  import { getCognitoSignInUrl } from '~/app_modules/cognito';
+
+  const { auth } = useSupabaseClient();
   const store  = useGlobalStore();
 
   const email = ref();
@@ -13,7 +15,10 @@
       password: password.value,
     })
     if(data.session){
-      store.logInSbUser(data.user.email||'')
+      store.$patch((state)=>{
+        state.email = data.user.email || 'you will never see this becase email is madatory!';
+        state.IdP = 'Supabase';
+      })
       navigateTo('/tools')
     } else {
       invalid.value = error?.message;
@@ -41,7 +46,7 @@
         </div>
 
         <Button label="Sign in" @click="onSubmit" :disabled="!(email&&password)"/>
-        <a href="https://owt.auth.eu-west-2.amazoncognito.com/login?response_type=token&client_id=63bife1al52prp81olr3hq0v49&redirect_uri=http://localhost:3000/awsAuth">or use aws Cognito</a>
+        <a :href="getCognitoSignInUrl()">or use aws Cognito</a>
 
       </form>
     </Fieldset>
