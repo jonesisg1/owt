@@ -12,7 +12,7 @@ export function getIdTokenFromHash (hash: string): string {
 export function getCognitoSignInUrl (): string {
     const runtimeConfig = useRuntimeConfig();
     const url = `${runtimeConfig.public.cognitoUserPoolDomain}/login?response_type=token&client_id=${runtimeConfig.public.cognitoAppClientId}&redirect_uri=${runtimeConfig.public.baseUrl}/awsAuth`;
-    console.log(url); 
+    // console.log(url); 
     return url;
 }
 
@@ -24,7 +24,7 @@ export function getCognitoSignOutUrl (): string {
 export async function decodeIdToken(token: string): Promise<tokenProps> { 
     const runtimeConfig = useRuntimeConfig();
     // Verifier that expects valid access tokens:
-    console.log(`pool=${runtimeConfig.public.cognitoUserPoolId} client=${runtimeConfig.public.cognitoAppClientId} token=${token}`)
+    // console.log(`pool=${runtimeConfig.public.cognitoUserPoolId} client=${runtimeConfig.public.cognitoAppClientId} token=${token}`)
     const verifier = CognitoJwtVerifier.create({
         userPoolId: runtimeConfig.public.cognitoUserPoolId,
         tokenUse: "id",

@@ -4,7 +4,6 @@
 
   console.log('tools <script setup>');
   const store = useGlobalStore();
-  console.log(`From store! ${store.email}`);
 
   const selectedTool = ref();
   const toolDialog = ref(false);
@@ -155,8 +154,8 @@
 
   function createPatch (source, target) {
     // source object properties from supabase are always strings
-    console.log(source)
-    console.log(target)
+    // console.log(source)
+    // console.log(target)
     let patch = {};
     let s, t;
     for(const prop in source) {
@@ -230,7 +229,8 @@
           <SearchInput v-model="filters['global'].value" @clear-filter="clearFilter()" />
         </template>
         <template #end>
-          <Button icon="pi pi-user"  size="small" @click="menuClick" />
+          <Button v-if="store.email" icon="pi pi-user"  size="small" @click="menuClick" />
+          <Button v-else icon="pi pi-sign-in" size="small" @click="navigateTo('/')" />
           <Menu ref="menu" :model="menuItems" :popup="true" :pt="{ root: {class: 'min-w-max'} }" />
         </template>
       </Toolbar>
