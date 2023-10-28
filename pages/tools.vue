@@ -1,4 +1,7 @@
 <script setup>
+  import { getCognitoSignOutUrl } from '~/app_modules/cognito';
+  import { FilterMatchMode, FilterOperator } from 'primevue/api';
+
   console.log('tools <script setup>');
   const store = useGlobalStore();
   console.log(`From store! ${store.email}`);
@@ -51,9 +54,13 @@
   }
 
   async function logout () {
-    const client = useSupabaseClient();
-    await client.auth.signOut();
-    navigateTo('/');
+    if(store.IdP === 'Supabase') {
+      const client = useSupabaseClient();
+      await client.auth.signOut();
+      navigateTo('/');
+    } else if(store.IdP === 'aws') {
+      navigateTo(getCognitoSignOutUrl(), { external: true });
+    }
   }
 
   async function showDialog () {
@@ -88,7 +95,7 @@
       body: {
         rowKey: selectedTool.value.asset_id
       }
-    });
+    }).catch((err) => alert(err.message));
     refresh();
     selectedTool.value = null;
     cursorWait.value = false;
@@ -110,7 +117,7 @@
     cursorWait.value = true;
     hideDialog();
     const authHeader = (store.IdP === 'aws') ? { Authorization: `Bearer ${store.awsIdToken}` } : '';
-    console.log(authHeader)
+    // console.log(authHeader)
     if(tool.value.asset_id === undefined){
       await $fetch( '/api/tools', {
         method: 'POST',
@@ -188,7 +195,6 @@
   })
 
   // DataTable filter logic
-  import { FilterMatchMode, FilterOperator } from 'primevue/api';
   const filters = ref();
   const initFilters = () => {
     filters.value = {

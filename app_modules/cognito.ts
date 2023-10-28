@@ -11,7 +11,12 @@ export function getIdTokenFromHash (hash: string): string {
 
 export function getCognitoSignInUrl (): string {
     const runtimeConfig = useRuntimeConfig();
-    return `${runtimeConfig.public.cognitoUserPoolDomain}/login?response_type=token&client_id=${runtimeConfig.public.cognitoAppClientId}&redirect_uri=http://localhost:3000/awsAuth` 
+    return `${runtimeConfig.public.cognitoUserPoolDomain}/login?response_type=token&client_id=${runtimeConfig.public.cognitoAppClientId}&redirect_uri=${runtimeConfig.public.baseUrl}/awsAuth` 
+}
+
+export function getCognitoSignOutUrl (): string {
+    const runtimeConfig = useRuntimeConfig();
+    return `${runtimeConfig.public.cognitoUserPoolDomain}/logout?client_id=${runtimeConfig.public.cognitoAppClientId}&logout_uri=${runtimeConfig.public.baseUrl}` 
 }
 
 export async function decodeIdToken(token: string): Promise<tokenProps> { 

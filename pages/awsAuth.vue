@@ -25,5 +25,5 @@
 </script>
 
 <template>
-    <p>Authorising...</p>
+    <p>Authenticating with aws Cognito...</p>
 </template>

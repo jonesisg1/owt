@@ -8,7 +8,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     cognitoAppClientSecret:'',
     public: {
-      baseUrl: process.env.BASE_URL || 'http://localhost:3000',
+      baseUrl: 'http://localhost:3000',
       cognitoUserPoolId:'',
       cognitoAppClientId: '',
       cognitoUserPoolDomain: '',
