@@ -2,7 +2,6 @@
   import { getCognitoSignOutUrl } from '~/app_modules/cognito';
   import { FilterMatchMode, FilterOperator } from 'primevue/api';
 
-  console.log('tools <script setup>');
   const store = useGlobalStore();
 
   const selectedTool = ref();
@@ -28,12 +27,12 @@
   });
 
   const columns = [
-    { field:'asset_id', header:'Asset ID' },
-    { field:'type', header:'Type' },
-    { field:'weight', header:'Weight' },
-    { field:'length', header:'Length' },
-    { field:'diameter', header:'Diameter' },
-    { field:'location', header:'Location' },
+    { field:'asset_id', header:'Asset ID', fixed:true },
+    { field:'type', header:'Type', fixed:false },
+    { field:'weight', header:'Weight', fixed:false },
+    { field:'length', header:'Length', fixed:false },
+    { field:'diameter', header:'Diameter', fixed:false },
+    { field:'location', header:'Location', fixed:false },
     // { field:'service_date', header: 'Service Date'}
     // Handle type and service_date in template.
   ];
@@ -181,9 +180,11 @@
   // ToolBar icons only for small screens
   const winSmall = ref(false);
   const toggleSearch = ref(false);
+  const winHeight = ref()
   function onResize() {
     winSmall.value = (window.innerWidth > 400) ? false : true;
     toggleSearch.value = (window.innerWidth > 700) ? false : true;
+    winHeight.value = window.innerHeight - ((window.innerWidth > 700) ? 90: 190);
   }
 
   onMounted(() => {
@@ -218,7 +219,7 @@
 
 <template>
   <div class="card" :class="{'cursor-wait': cursorWait}">
-    <div class="fixed top-0 w-full min-w-max z-5" style="background-color: white;">
+    <!-- <div class="fixed top-0 w-full min-w-max z-5" style="background-color: white;"> -->
       <Toolbar>
         <template #start>
           <Button icon="pi pi-plus" :label="(winSmall) ? null : 'New'" severity="success" class="mr-2" size="small" @click="newTool" :disabled="cursorWait" />
@@ -234,14 +235,14 @@
           <Menu ref="menu" :model="menuItems" :popup="true" :pt="{ root: {class: 'min-w-max'} }" />
         </template>
       </Toolbar>
-    </div>
+    <!-- </div> -->
    
-    <DataTable v-model:filters="filters" v-model:selection="selectedTool" :value="tools" data-key="asset_id" tableStyle="min-width: 50rem" class="mt-8" filterDisplay="menu" :globalFilterFields="['asset_id', 'weight', 'length', 'diameter', 'location', 'service_date', 'type']">
+    <DataTable v-model:filters="filters" v-model:selection="selectedTool" :value="tools" data-key="asset_id" tableStyle="min-width: 50rem" scrollable :scrollHeight="`${winHeight}px`" class="mt-2" filterDisplay="menu" :globalFilterFields="['asset_id', 'weight', 'length', 'diameter', 'location', 'service_date', 'type']">
       <template v-if="toggleSearch" #header>
         <SearchInput v-model="filters['global'].value" @clear-filter="clearFilter()" />
       </template>
-      <Column selectionMode="single" style="width: 3rem" :exportable="false"></Column>
-      <Column v-for="col of columns" :key="col.field" :field="col.field" :header="col.header"></Column>
+      <Column selectionMode="single" style="width: 3rem" :exportable="false" frozen></Column>
+      <Column v-for="col of columns" :key="col.field" :field="col.field" :header="col.header" :frozen="col.fixed"></Column>
       <Column header="Service Date">
         <template #body="slotProps">
           {{ slotProps.data.service_date.toLocaleDateString('en-GB') }}
