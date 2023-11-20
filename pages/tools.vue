@@ -182,9 +182,9 @@
   const toggleSearch = ref(false);
   const winHeight = ref()
   function onResize() {
-    winSmall.value = (window.innerWidth > 400) ? false : true;
-    toggleSearch.value = (window.innerWidth > 700) ? false : true;
-    winHeight.value = window.innerHeight - ((window.innerWidth > 700) ? 90: 190);
+    winSmall.value = (window.innerWidth > 410) ? false : true;
+    toggleSearch.value = (window.innerWidth > 710) ? false : true;
+    winHeight.value = window.innerHeight - ((window.innerWidth > 710) ? 90: 190);
   }
 
   onMounted(() => {

@@ -1,8 +1,6 @@
 import { serverSupabaseClient } from '#supabase/server';
 export default defineEventHandler(async (event) => {
 
-  console.log('tools.get')
-
   const client = await serverSupabaseClient(event);
   // const { user } = (await client.auth.getUser()).data;
   
